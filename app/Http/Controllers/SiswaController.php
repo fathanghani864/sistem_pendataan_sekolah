@@ -13,31 +13,54 @@ class SiswaController extends Controller
     /**
      * Display a listing of the resource.
      */
-   public function index(Request $request)
-    {
-        $search = $request->search;
+  public function index(Request $request)
+{
+    $search         = $request->search;
+    $filterJurusan  = $request->jurusan_id;
+    $filterKelas    = $request->kelas_id;
+    $filterTahun    = $request->tahun_ajar_id;
+    $filterKelamin  = $request->jenis_kelamin;
 
-        $siswa = Siswa::with(['jurusan', 'kelas', 'tahunAjar'])
-            ->when($search, function ($query, $search) {
-                $query->where('nisn', 'like', "%{$search}%")
-                      ->orWhere('nama_lengkap', 'like', "%{$search}%")
-                      ->orWhere('jenis_kelamin', 'like', "%{$search}%")
-                      ->orWhereHas('jurusan', function ($q) use ($search) {
-                          $q->where('nama_jurusan', 'like', "%{$search}%");
-                      })
-                      ->orWhereHas('kelas', function ($q) use ($search) {
-                          $q->where('nama_kelas', 'like', "%{$search}%");
-                      })
-                      ->orWhereHas('tahunAjar', function ($q) use ($search) {
-                          $q->where('nama_tahun_ajar', 'like', "%{$search}%");
-                      });
-            })
-            ->orderBy('nama_lengkap')
-            ->get();
+    $siswa = Siswa::with(['jurusan', 'kelas', 'tahunAjar'])
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nisn', 'like', "%{$search}%")
+                  ->orWhere('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('jenis_kelamin', 'like', "%{$search}%")
+                  ->orWhereHas('jurusan', function ($q) use ($search) {
+                      $q->where('nama_jurusan', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('kelas', function ($q) use ($search) {
+                      $q->where('nama_kelas', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('tahunAjar', function ($q) use ($search) {
+                      $q->where('nama_tahun_ajar', 'like', "%{$search}%");
+                  });
+            });
+        })
+        ->when($filterJurusan, function ($q, $jurusanId) {
+            $q->where('jurusan_id', $jurusanId);
+        })
+        ->when($filterKelas, function ($q, $kelasId) {
+            $q->where('kelas_id', $kelasId);
+        })
+        ->when($filterTahun, function ($q, $tahunId) {
+            $q->where('tahun_ajar_id', $tahunId);
+        })
+        ->when($filterKelamin, function ($q, $kelamin) {
+            $q->where('jenis_kelamin', $kelamin);
+        })
+        ->orderBy('nama_lengkap')
+        ->get();
 
-        // SESUAIKAN dgn nama view kamu:
-        return view('admin.siswa.siswa', compact('siswa'));
-    }
+    // data buat dropdown filter
+    $jurusan   = Jurusan::orderBy('nama_jurusan')->get();
+    $kelas     = Kelas::orderBy('nama_kelas')->get();
+    $tahunAjar = TahunAjar::orderBy('nama_tahun_ajar')->get();
+
+    return view('admin.siswa.siswa', compact('siswa', 'jurusan', 'kelas', 'tahunAjar'));
+}
+
 
     /**
      * Display detail siswa

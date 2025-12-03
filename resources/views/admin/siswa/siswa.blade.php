@@ -20,47 +20,114 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 md:mt-6">
             <div class="bg-white shadow-md rounded-xl p-4 md:p-6">
 
-                <!-- Search + Add Button -->
-              <!-- Search + Add Button -->
-<!-- Search + Add Button -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5 gap-4">
+              <!-- Search + Filter + Add Button -->
+<div class="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-5 gap-4">
 
-    {{-- FORM SEARCH --}}
+    {{-- FORM SEARCH + FILTER --}}
     <form method="GET" action="{{ route('siswa.index') }}"
-          class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-1/2">
+          class="w-full lg:w-3/4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
 
-        <div class="relative w-full">
-            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
-                <i class="fa fa-search"></i>
-            </span>
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                class="w-full rounded-full pl-10 pr-4 py-2 border border-gray-300
-                       focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                placeholder="Cari NISN / nama / jurusan / kelas..."
-            >
+        {{-- SEARCH --}}
+        <div class="col-span-1 md:col-span-2">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                    <i class="fa fa-search"></i>
+                </span>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    class="w-full rounded-full pl-10 pr-4 py-2 border border-gray-300
+                           focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                    placeholder="Cari NISN / nama / jurusan / kelas..."
+                >
+            </div>
         </div>
 
-        <button
-            type="submit"
-            class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-white text-sm">
-            Cari
-        </button>
+        {{-- FILTER JURUSAN --}}
+        <div>
+            <select name="jurusan_id"
+                    class="w-full rounded-full border border-gray-300 py-2 px-3 text-sm
+                           focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">Semua Jurusan</option>
+                @foreach ($jurusan as $j)
+                    <option value="{{ $j->id }}"
+                        {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
+                        {{ $j->nama_jurusan }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-        <a href="{{ route('siswa.index') }}"
-           class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-800 text-sm text-center">
-            Clear
-        </a>
+        {{-- FILTER KELAS --}}
+        <div>
+            <select name="kelas_id"
+                    class="w-full rounded-full border border-gray-300 py-2 px-3 text-sm
+                           focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">Semua Kelas</option>
+                @foreach ($kelas as $k)
+                    <option value="{{ $k->id }}"
+                        {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
+                        {{ $k->nama_kelas }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- FILTER TAHUN AJAR --}}
+        <div>
+            <select name="tahun_ajar_id"
+                    class="w-full rounded-full border border-gray-300 py-2 px-3 text-sm
+                           focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">Semua Tahun Ajar</option>
+                @foreach ($tahunAjar as $t)
+                    <option value="{{ $t->id }}"
+                        {{ request('tahun_ajar_id') == $t->id ? 'selected' : '' }}>
+                        {{ $t->nama_tahun_ajar }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- FILTER JENIS KELAMIN --}}
+        <div>
+            <select name="jenis_kelamin"
+                    class="w-full rounded-full border border-gray-300 py-2 px-3 text-sm
+                           focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">Semua Jenis Kelamin</option>
+                <option value="laki-laki" {{ request('jenis_kelamin') == 'laki-laki' ? 'selected' : '' }}>
+                    Laki-laki
+                </option>
+                <option value="perempuan" {{ request('jenis_kelamin') == 'perempuan' ? 'selected' : '' }}>
+                    Perempuan
+                </option>
+            </select>
+        </div>
+
+        {{-- BUTTON CARI & CLEAR --}}
+        <div class="flex gap-2 md:col-span-2">
+            <button
+                type="submit"
+                class="flex-1 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-white text-sm">
+                Terapkan Filter
+            </button>
+
+            <a href="{{ route('siswa.index') }}"
+               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-800 text-sm text-center">
+                Reset
+            </a>
+        </div>
+
     </form>
 
+    {{-- BUTTON TAMBAH DATA --}}
     <a href="{{ route('siswa.create') }}"
        class="px-4 md:px-5 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full
               text-sm text-center">
         + Tambah Data
     </a>
 </div>
+
 
 
 
